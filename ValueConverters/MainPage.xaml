@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:local="clr-namespace:ValueConverters.Converters"
+                     			 x:Class="ValueConverters.MainPage"
+             Title="Value Converters"
+             >
+    <ContentPage.Resources>
+        <local:FloatToIntConverter x:Key="floatToInt"/>
+        <local:TotalValueConverter x:Key="totalConverter"/>
+        <local:RGBConverter x:Key="rgbConverter"/>
+     </ContentPage.Resources>
+
+    <Grid ColumnDefinitions="100,100,150,*" RowDefinitions="50,50,50,50,60,50,50,50,50" >
+        <Label  Grid.Column="0"  Text="Red" Margin="5"  
+                HorizontalTextAlignment="End"  
+                VerticalOptions="Center"/>
+        <Slider Grid.Column="1" ThumbColor="Red"
+                Maximum="255" Minimum="0" x:Name="Red"  />
+        <Entry  Grid.Column="2"   Margin="5" HorizontalTextAlignment="Start" 
+                BindingContext="{x:Reference Name=Red}" 
+                Text="{Binding Path=Value, Converter={StaticResource floatToInt}}"
+                VerticalOptions="Center"
+                x:Name="redValue"
+                />
+
+        <Label  Grid.Row="1" Grid.Column="0"  Text="Green" Margin="5"  
+                HorizontalTextAlignment="End"  
+                VerticalOptions="Center"/>
+        <Slider Grid.Row="1" Grid.Column="1" ThumbColor="Green"
+                Maximum="255" Minimum="0" x:Name="Green"  />
+        <Entry   Grid.Row="1" Grid.Column="2"  Margin="5" HorizontalTextAlignment="Start" 
+                BindingContext="{x:Reference Name=Green}" 
+                Text="{Binding Path=Value, Converter={StaticResource floatToInt}}"
+                VerticalOptions="Center"
+                x:Name="greenValue"
+                />
+
+        <Label  Grid.Row="2" Grid.Column="0"  Text="Blue" Margin="5"  
+                HorizontalTextAlignment="End"  
+                VerticalOptions="Center"/>
+        <Slider Grid.Row="2" Grid.Column="1" ThumbColor="Blue"
+                Maximum="255" Minimum="0" x:Name="Blue"  />
+        <Entry  Grid.Row="2" Grid.Column="2"   Margin="5" HorizontalTextAlignment="Start" 
+                BindingContext="{x:Reference Name=Blue}" 
+                Text="{Binding Path=Value, Converter={StaticResource floatToInt}}"
+                VerticalOptions="Center"
+                x:Name="blueValue"
+                />
+
+
+        <Label  Grid.Column="1" Grid.Row="3"   Margin="5" 
+                HorizontalTextAlignment="End"  
+                VerticalOptions="Center" Text="Sum:"/>
+        <Entry Grid.Column="2" Grid.Row="3"  Margin="5" HorizontalTextAlignment="Start" 
+                VerticalOptions="Center" 
+               >
+            <Entry.Text>
+                <MultiBinding  Converter="{StaticResource totalConverter}">
+                    <Binding Source="{x:Reference Name=redValue}"  Path="Text" />
+                    <Binding Source="{x:Reference Name=greenValue}"  Path="Text" />
+                    <Binding Source="{x:Reference Name=blueValue}"  Path="Text" />
+                </MultiBinding>
+            </Entry.Text>
+        </Entry>
+
+        <StackLayout Grid.ColumnSpan="5" Grid.Row="4"  Margin="10">
+            <StackLayout.BackgroundColor>
+                <MultiBinding  Converter="{StaticResource rgbConverter}">
+                    <Binding Source="{x:Reference Name=Red}"  Path="Value" />
+                    <Binding Source="{x:Reference Name=Green}"  Path="Value" />
+                    <Binding Source="{x:Reference Name=Blue}"  Path="Value" />
+                </MultiBinding>
+            </StackLayout.BackgroundColor>
+        </StackLayout>
+
+        <StackLayout Grid.ColumnSpan="5" Grid.Row="5"  Grid.RowSpan="3"   Margin="10"
+                      Orientation="Horizontal"  VerticalOptions="Center">
+            <Label Text="Has Pending Payment?" VerticalTextAlignment="Center" />
+            <Switch x:Name="switchPendingPayments" />
+            <Label VerticalTextAlignment="Center">
+                <Label.Text>
+                    <Binding Source="{x:Reference switchPendingPayments}"
+                             Path="IsToggled">
+                        <Binding.Converter>
+                            <local:BoolToObjectConverter x:TypeArguments="x:String"
+                                                         TrueObject="Yes!"
+                                                         FalseObject="No"/>
+                        </Binding.Converter>
+                    </Binding>
+                </Label.Text>
+                <Label.TextColor>
+                    <Binding Source="{x:Reference switchPendingPayments}"
+                             Path="IsToggled">
+                        <Binding.Converter>
+                            <local:BoolToObjectConverter x:TypeArguments="Color"
+                                                         TrueObject="Red"
+                                                         FalseObject="Green"/>
+                        </Binding.Converter>
+                    </Binding>
+                </Label.TextColor>
+            </Label>
+        </StackLayout>
+        <StackLayout Grid.ColumnSpan="5" Grid.Row="6"  Grid.RowSpan="3"   Margin="10"  
+                     Orientation="Horizontal"  VerticalOptions="Center" >
+            <StackLayout.IsVisible>
+                <Binding Source="{x:Reference switchPendingPayments}"
+                             Path="IsToggled">
+                    <Binding.Converter>
+                        <local:BoolToObjectConverter x:TypeArguments="x:Boolean"
+                                                         TrueObject="True"
+                                                         FalseObject="False" />
+                    </Binding.Converter>
+                </Binding>
+            </StackLayout.IsVisible>
+            <Label Text="Amount Due"  VerticalTextAlignment="Center"           
+                   />
+            <Entry FontSize="18" MinimumWidthRequest="150"
+                   VerticalOptions="Center" >
+                <Entry.Style>
+                    <Binding Source="{x:Reference switchPendingPayments}"
+                             Path="IsToggled">
+                        <Binding.Converter>
+                            <local:BoolToObjectConverter x:TypeArguments="Style">
+                                <local:BoolToObjectConverter.TrueObject>
+                                    <Style TargetType="Entry">
+                                        <Setter Property="Text" Value="00.00" />
+                                        <Setter Property="FontAttributes" Value="Italic, Bold" />
+                                        <Setter Property="TextColor" Value="Red" />
+                                    </Style>
+                                </local:BoolToObjectConverter.TrueObject>
+                                <local:BoolToObjectConverter.FalseObject>
+                                    <Style TargetType="Entry">
+                                        <Setter Property="Text" Value="00.00" />
+                                        <Setter Property="TextColor" Value="Black" />
+                                        <Setter Property="IsVisible"   Value="False" />
+                                    </Style>
+                                </local:BoolToObjectConverter.FalseObject>
+                            </local:BoolToObjectConverter>
+                        </Binding.Converter>
+                    </Binding>
+                </Entry.Style>
+            </Entry>
+        </StackLayout>
+
+
+    </Grid>
+
+
+
+</ContentPage>
